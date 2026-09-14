@@ -1,0 +1,375 @@
+/* ==========================================================================
+   easy.css — dedicated styling for easy.html
+   Design concept: TOTP is literally "time-based" — the countdown ring and
+   the LCD-style digit display are drawn directly from that fact, not
+   decoration. One accent color (signal amber) marks the one thing that's
+   always live: the current code and its ring. Everything else stays quiet.
+   ========================================================================== */
+
+:root {
+  /* Dark theme is the default. */
+  --bg: #0D1120;
+  --surface: #171B2E;
+  --ink: #F4F6FB;
+  --muted: #99A2B8;
+  --line: #2A3050;
+  --accent: #E8963D;
+  --accent-soft: rgba(232, 150, 61, 0.18);
+  --code-color: #FFFFFF;
+  --radius-lg: 28px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+  --sans: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+[data-theme="light"] {
+  --bg: #F4F6F9;
+  --surface: #FFFFFF;
+  --ink: #12162A;
+  --muted: #5B6478;
+  --line: #E1E5EC;
+  --accent: #E8963D;
+  --accent-soft: #FBEBD6;
+  --code-color: #D6402C;
+}
+
+body { transition: background 0.2s ease, color 0.2s ease; }
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 48px 20px 80px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  display: flex;
+  justify-content: center;
+}
+
+.shell {
+  width: 100%;
+  max-width: 560px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Top bar — small icon in the corner, not a hero                         */
+/* ---------------------------------------------------------------------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+.brand-compact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-icon-sm {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  display: block;
+}
+.brand-name {
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+.theme-toggle:hover { color: var(--ink); border-color: var(--accent); }
+
+/* ---------------------------------------------------------------------- */
+/* State cards (checking / provisioning / running) share one shell        */
+/* ---------------------------------------------------------------------- */
+.state-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  box-shadow: 0 1px 2px rgba(18, 22, 42, 0.04);
+}
+
+.state-checking {
+  text-align: center;
+  color: var(--muted);
+  padding: 56px 36px;
+}
+
+.spinner {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  border: 3px solid var(--line);
+  border-top-color: var(--accent);
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; border-top-color: var(--line); }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Provisioning                                                            */
+/* ---------------------------------------------------------------------- */
+.state-provisioning h2 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+.state-provisioning .hint {
+  margin: 0 0 28px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.methods {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 16px;
+}
+/* Previously spanned the full width (1 + 2 + 1 layout); now a clean 2x2
+   matrix like the other pages, with all four tiles evenly sized. */
+.method-primary { grid-column: auto; }
+
+.method {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  background: var(--bg);
+}
+.method-title {
+  margin: 0 0 2px;
+  font-weight: 600;
+  font-size: 15px;
+}
+.method-sub {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.dropzone {
+  border: 2px dashed var(--line);
+  border-radius: var(--radius-sm);
+  min-height: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  background: var(--surface);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.dropzone.drag-over {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.dropzone-compact { min-height: 72px; white-space: pre-wrap; padding: 8px; }
+.dropzone-hint { width: 28px; height: 28px; opacity: 0.5; }
+
+.method-sample {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+.method-sample img { border-radius: 4px; cursor: grab; }
+
+.method textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 10px;
+  background: var(--surface);
+}
+.method-icon { cursor: pointer; margin-bottom: 10px; display: block; }
+
+/* ---------------------------------------------------------------------- */
+/* Running / loaded — the live code display                               */
+/* ---------------------------------------------------------------------- */
+.state-running {
+  text-align: center;
+}
+
+.field-label {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+#issuer {
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--ink);
+  width: 100%;
+  margin-bottom: 28px;
+}
+#issuer:focus { outline: none; }
+
+.code-ring {
+  display: grid;
+  place-items: center;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto;
+}
+.code-ring > * { grid-area: 1 / 1; }
+
+.ring-svg { width: 300px; height: 300px; }
+.ring-track {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 6;
+}
+.ring-progress {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke-dashoffset 1s linear;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ring-progress { transition: none; }
+}
+
+.code-display #myTotp {
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 48px;
+  letter-spacing: 0.05em;
+  color: var(--code-color);
+  width: 230px;
+}
+.code-display #myTotp:focus { outline: none; }
+
+.countdown-text {
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.status-text {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 13px;
+  min-height: 1em;
+}
+.status-text code {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Utility                                                                 */
+/* ---------------------------------------------------------------------- */
+.visually-hidden {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 18px;
+  color: var(--muted);
+  font-size: 13px;
+  text-decoration: none;
+}
+.back-link:hover { color: var(--accent); }
+
+.method-title { display: flex; align-items: center; gap: 6px; }
+.method-glyph { color: var(--accent); flex-shrink: 0; }
+
+.method-icon-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.protect-choice { margin-top: 24px; }
+.protect-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.protect-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  cursor: pointer;
+}
+.protect-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.active-method-tag {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.active-method-tag img { width: 16px; height: 16px; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 520px) {
+  .methods { grid-template-columns: 1fr; }
+  .method-primary { grid-column: auto; }
+  .state-card { padding: 24px; }
+  .code-ring, .ring-svg { width: 256px; height: 256px; }
+  .code-display #myTotp { font-size: 40px; width: 190px; }
+  .protect-buttons { flex-direction: column; }
+}

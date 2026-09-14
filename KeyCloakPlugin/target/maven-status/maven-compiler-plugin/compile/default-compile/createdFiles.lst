@@ -1,0 +1,11 @@
+com/zerotp/keycloak/credential/HardwareTotpCredentialProviderFactory.class
+com/zerotp/keycloak/util/Base32Util.class
+com/zerotp/keycloak/authenticator/HardwareTotpEnrollRequiredActionFactory.class
+com/zerotp/keycloak/authenticator/HardwareTotpAuthenticator.class
+com/zerotp/keycloak/credential/HardwareTotpCredentialProvider.class
+com/zerotp/keycloak/credential/HardwareTotpCredentialModel.class
+com/zerotp/keycloak/authenticator/HardwareTotpAuthenticatorFactory.class
+com/zerotp/keycloak/credential/HardwareTotpCredentialModel$SecretData.class
+com/zerotp/keycloak/util/WebAuthnAssertionVerifier.class
+com/zerotp/keycloak/credential/HardwareTotpCredentialModel$CredentialData.class
+com/zerotp/keycloak/authenticator/HardwareTotpEnrollRequiredAction.class

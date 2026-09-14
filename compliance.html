@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZeroOTP &mdash; NIST &amp; Microsoft mapping</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/uploadFile.css">
+  <link rel="stylesheet" href="css/easy.css">
+  <link rel="stylesheet" href="css/compliance.css">
+</head>
+<body>
+<main class="shell">
+
+  <header class="topbar">
+    <div class="brand-compact">
+      <img src="img/icon.png" width="72" height="72" alt="ZeroOTP icon" class="brand-icon-sm">
+      <span class="brand-name">ZeroOTP</span>
+    </div>
+    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light mode">
+      <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5Z" fill="currentColor"/>
+      </svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" hidden>
+        <circle cx="12" cy="12" r="5" fill="currentColor"/>
+        <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="12" y1="1" x2="12" y2="4"/>
+          <line x1="12" y1="20" x2="12" y2="23"/>
+          <line x1="1" y1="12" x2="4" y2="12"/>
+          <line x1="20" y1="12" x2="23" y2="12"/>
+          <line x1="4.2" y1="4.2" x2="6.3" y2="6.3"/>
+          <line x1="17.7" y1="17.7" x2="19.8" y2="19.8"/>
+          <line x1="4.2" y1="19.8" x2="6.3" y2="17.7"/>
+          <line x1="17.7" y1="6.3" x2="19.8" y2="4.2"/>
+        </g>
+      </svg>
+    </button>
+  </header>
+
+  <a class="back-link" href="index.html">&larr; Back to ZeroOTP hub</a>
+
+  <section class="state-card compliance-doc">
+    <h1>NIST &amp; Microsoft Authentication Framework Mapping</h1>
+    <p class="doc-meta">Companion page to the summary on <a href="index.html">index.html</a>. Source markdown: <a href="COMPLIANCE.md">COMPLIANCE.md</a>. Last checked against sources: September 2026.</p>
+
+    <p>This page maps each ZeroOTP storage method to current NIST and Microsoft authentication guidance, and links to the primary sources.</p>
+
+    <h2>Frameworks used</h2>
+    <p>
+      <b>NIST SP 800-63B-4</b> &mdash; <i>Digital Identity Guidelines: Authentication and Authenticator Management.</i>
+      Final revision published July 2025, superseding SP 800-63B-3. Defines three Authenticator Assurance Levels
+      (AAL1/AAL2/AAL3) and, new in this revision, explicit guidance for <u>syncable authenticators</u>
+      (passkeys stored in a cloud-synced vault such as Chrome/Google Password Manager, iCloud Keychain, etc.),
+      integrating NIST's April 2024 interim passkey guidance as normative text.
+    </p>
+    <ul>
+      <li>Overview: <a href="https://pages.nist.gov/800-63-4">pages.nist.gov/800-63-4</a></li>
+      <li>SP 800-63B-4 full text: <a href="https://pages.nist.gov/800-63-4/sp800-63b.html">pages.nist.gov/800-63-4/sp800-63b.html</a></li>
+      <li>Publication record: <a href="https://csrc.nist.gov/pubs/sp/800/63/b/4/final">csrc.nist.gov/pubs/sp/800/63/b/4/final</a></li>
+    </ul>
+
+    <p>
+      <b>Microsoft Entra ID</b> &mdash; Conditional Access authentication strengths. Three built-in tiers
+      &mdash; <u>MFA strength</u>, <u>Passwordless MFA strength</u>, and <u>Phishing-resistant MFA strength</u>
+      &mdash; each accepting a specific, progressively narrower set of authentication method combinations.
+    </p>
+    <ul>
+      <li>Overview: <a href="https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-strengths">learn.microsoft.com &hellip; concept-authentication-strengths</a></li>
+      <li>Phishing-resistant deployment guide: <a href="https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-deploy-phishing-resistant-passwordless-authentication">learn.microsoft.com &hellip; phishing-resistant-passwordless-authentication</a></li>
+    </ul>
+
+    <h2>Mapping table</h2>
+    <table>
+      <tr><th>ZeroOTP method</th><th>Underlying mechanism</th><th>NIST SP 800-63B-4</th><th>Microsoft Entra strength</th></tr>
+      <tr>
+        <td>Cookie (full.html)</td>
+        <td>Shared-secret TOTP, AES-encrypted, Master Password</td>
+        <td>Software OATH token. Can support <b>AAL2</b> only when paired with a genuinely separate primary factor; <i>not phishing-resistant</i> &mdash; 800-63B-4 requires AAL2 verifiers to also offer a phishing-resistant option, not rely on OTP alone.</td>
+        <td><b>MFA strength</b> only (classified as "password plus something the user has"). Does not qualify for Passwordless or Phishing-resistant MFA strength.</td>
+      </tr>
+      <tr>
+        <td>LocalStorage (full.html)</td>
+        <td>Same as Cookie &mdash; only the storage location differs</td>
+        <td>Same as Cookie</td>
+        <td>Same as Cookie</td>
+      </tr>
+      <tr>
+        <td>Chrome Password Manager, TOTP mode (index.html, easy.html, full.html)</td>
+        <td>Shared-secret TOTP, stored via <code>navigator.credentials</code>, Chrome's own encryption</td>
+        <td>Same as Cookie &mdash; the storage backend changes, the authenticator type (shared-secret OTP) does not</td>
+        <td>Same as Cookie</td>
+      </tr>
+      <tr>
+        <td>Biometric / passkey (biometry.html, full.html)</td>
+        <td>WebAuthn public-key credential (passkey) with platform user verification (Touch ID / Windows Hello / Android biometrics), PRF-derived AES-GCM key</td>
+        <td><b>AAL2</b> when the passkey is a syncable credential held in Chrome/Google Password Manager (this project's case), per the syncable-authenticator provisions in 800-63B-4 Appendix B. Genuinely <i>phishing-resistant</i> &mdash; the credential is cryptographically bound to this origin. Would need a non-syncable, device-bound passkey to claim AAL3, which is not what Chrome Password Manager stores.</td>
+        <td>Qualifies for all three tiers, including <b>Phishing-resistant MFA strength</b> (the "FIDO2 security key / Windows Hello for Business or platform credential" family)</td>
+      </tr>
+      <tr>
+        <td>Biometric fallback "gate" mode (js/biometric.js)</td>
+        <td>Non-extractable AES-GCM key in IndexedDB, WebAuthn assertion required by application logic only</td>
+        <td>Does <u>not</u> meet the AAL2 phishing-resistance bar in the same sense &mdash; the biometric check is enforced by this page's code, not by a cryptographic binding between the credential and the key.</td>
+        <td>Would not qualify as "phishing-resistant" under a strict reading, since the binding is not cryptographic</td>
+      </tr>
+    </table>
+
+    <div class="callout">
+      <p><b>Practical takeaway:</b> if you need to describe ZeroOTP's <i>strongest</i> configuration in security or
+      compliance language &mdash; <u>the Biometric method, in its primary PRF mode, is the only one of the four
+      storage backends that is phishing-resistant</u> and maps to NIST AAL2 / Microsoft's Phishing-resistant MFA
+      strength. The three TOTP-based backends (Cookie, LocalStorage, Chrome Password Manager storing a shared
+      secret) are all the same underlying authenticator type &mdash; a software OATH token &mdash; and all land
+      at the same, lower tier: NIST AAL2 <i>without</i> phishing resistance, Microsoft's baseline MFA strength only.</p>
+    </div>
+
+    <p>This is a factual mapping, not a security audit. It describes how the mechanisms this project uses are
+    <i>categorized</i> by these two frameworks &mdash; it does not certify ZeroOTP against either one, and neither
+    framework publishes a certification program for hobby/personal-use software like this.</p>
+  </section>
+
+</main>
+
+<script type="text/javascript" src="js/index.js"></script>
+</body>
+</html>

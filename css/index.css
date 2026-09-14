@@ -1,0 +1,72 @@
+/* ==========================================================================
+   index.css — dedicated additions for index.html (the hub/landing page)
+   Reuses easy.css tokens (--ink, --accent, --bg, etc.)
+   ========================================================================== */
+
+.hub-hero {
+  text-align: center;
+  padding: 8px 0 4px;
+}
+.hub-hero h1 { margin: 0 0 8px; font-size: 26px; }
+.hub-hero p { color: var(--muted); font-size: 15px; max-width: 520px; margin: 0 auto; }
+
+.hub-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* Text-heavy sections (limitations, compliance) stay readable even at the
+   page's doubled width — only the card-grid above uses the full measure. */
+#zerotpIndexTextSections {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.hub-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 22px;
+  background: var(--surface, var(--bg));
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.hub-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.hub-card .hub-icons { display: flex; gap: 8px; margin-bottom: 14px; }
+.hub-card .hub-icons img { width: 26px; height: 26px; }
+.hub-card h3 { margin: 0 0 6px; font-size: 17px; }
+.hub-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.hub-card .hub-badge {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.limitations-list li { margin-bottom: 10px; line-height: 1.5; }
+.limitations-list b { color: var(--ink); }
+
+.compliance-block {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.compliance-block p { margin: 0 0 12px; }
+.compliance-block b, .compliance-block u { color: var(--ink); }
+.compliance-block table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12.5px; }
+.compliance-block th, .compliance-block td {
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.compliance-block th { color: var(--ink); font-weight: 600; }
+
+@media (max-width: 720px) {
+  .hub-cards { grid-template-columns: 1fr; }
+}

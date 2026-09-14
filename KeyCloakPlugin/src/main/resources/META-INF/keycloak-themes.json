@@ -1,0 +1,8 @@
+{
+  "themes": [
+    {
+      "name": "hardware-totp",
+      "types": ["login"]
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+<!DOCTYPE HTML>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZeroOTP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/uploadFile.css">
+  <link rel="stylesheet" href="css/easy.css">
+  <script type="text/javascript" src="js/zxing.js"></script>
+  <script type="text/javascript" src="js/totp.js"></script>
+  <script type="text/javascript" src="js/biometric.js"></script>
+</head>
+<body>
+<main class="shell">
+
+  <header class="topbar">
+    <div class="brand-compact">
+      <img src="img/icon.png" width="72" height="72" alt="ZeroOTP icon" class="brand-icon-sm">
+      <span class="brand-name">ZeroOTP</span>
+    </div>
+    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light mode">
+      <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5Z" fill="currentColor"/>
+      </svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" hidden>
+        <circle cx="12" cy="12" r="5" fill="currentColor"/>
+        <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="12" y1="1" x2="12" y2="4"/>
+          <line x1="12" y1="20" x2="12" y2="23"/>
+          <line x1="1" y1="12" x2="4" y2="12"/>
+          <line x1="20" y1="12" x2="23" y2="12"/>
+          <line x1="4.2" y1="4.2" x2="6.3" y2="6.3"/>
+          <line x1="17.7" y1="17.7" x2="19.8" y2="19.8"/>
+          <line x1="4.2" y1="19.8" x2="6.3" y2="17.7"/>
+          <line x1="17.7" y1="6.3" x2="19.8" y2="4.2"/>
+        </g>
+      </svg>
+    </button>
+  </header>
+
+  <a class="back-link" href="index.html">&larr; Back to ZeroOTP hub</a>
+
+  <!-- Shown briefly while the page silently checks Chrome Password
+       Manager (and, locally, the biometric vault) for existing data.
+       Never shows any browser UI by itself — see initEasyPage() in easy.js. -->
+  <div id="checkingNotice" class="state-card state-checking">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Looking for saved codes&hellip;</p>
+  </div>
+
+  <!-- ======================================================================
+       A biometric vault exists locally, but there's no Password Manager
+       credential to auto-load. Unlocking a passkey always needs an explicit
+       user gesture, so this is a deliberate button, not an auto-action.
+       ====================================================================== -->
+  <section id="bioPromptView" class="state-card" hidden>
+    <div class="method-icon-row">
+      <img src="img/icons/biometry.svg" width="28" height="28" alt="Biometry">
+    </div>
+    <h2 style="text-align:center;">Biometric vault found</h2>
+    <p class="hint" style="text-align:center;">Unlock it with your passkey to load your code.</p>
+    <div style="text-align:center; margin-top:16px;">
+      <button class="button" id="btnBioUnlock" type="button">Unlock with passkey</button>
+    </div>
+    <div id="bioPromptStatus" class="status-text" style="text-align:center;"></div>
+  </section>
+
+  <!-- ======================================================================
+       NEW: nothing was found anywhere. Show the provisioning methods plus
+       the Authenticator section below.
+       ====================================================================== -->
+  <section id="provisioningView" class="state-card state-provisioning" hidden>
+    <h2>Add your first code</h2>
+    <p class="hint">Bring in a QR code using any of the methods below.</p>
+
+    <div class="methods">
+      <div class="method method-primary">
+        <p class="method-title"><svg class="method-glyph" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z" fill="currentColor"/></svg> Drop a QR image</p>
+        <p class="method-sub">Drag one in from this page, or your desktop</p>
+        <div class="dropzone" id="div1"
+             ondrop="drop(event)" ondragover="allowDrop(event)">
+          <span>Drop image here</span>
+        </div>
+        <div class="method-sample">
+          <img id="drag1" src="img/qrcode.png" draggable="true" ondragstart="drag(event)" width="72" height="21" alt="Sample QR code">
+          <span>myOtp@example.com</span>
+        </div>
+      </div>
+
+      <div class="method">
+        <p class="method-title"><svg class="method-glyph" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="6" y="4" width="12" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 2h6v3H9z" fill="currentColor"/></svg> Paste a QR image</p>
+        <p class="method-sub">Copy an image, then paste it below</p>
+        <img src="img/copyToClipboard.png" onclick="copyToClipboardImg()" width="30" class="method-icon" alt="Insert a sample QR code" title="Insert a sample QR code">
+        <textarea id="textOnly" rows="3" onchange="fromTextOnly()" placeholder="Paste image data here"></textarea>
+      </div>
+
+      <div class="method">
+        <p class="method-title"><svg class="method-glyph" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v6M9 12h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Drop from another window</p>
+        <p class="method-sub">Drag an image from another browser tab</p>
+        <div class="dropzone dropzone-compact" ondrop="dropFromBrowser(event)" ondragover="allowDrop(event)">
+          <span>Drop here</span>
+        </div>
+        <img id="div3" src="" hidden alt="">
+      </div>
+
+      <div class="method">
+        <p class="method-title"><svg class="method-glyph" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 2h9l5 5v15H6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 2v5h5" fill="none" stroke="currentColor" stroke-width="2"/></svg> Drop a file</p>
+        <p class="method-sub">From Finder or Explorer</p>
+        <div id="output" class="dropzone dropzone-compact"
+             ondragenter="document.getElementById('output').textContent = ''; event.stopPropagation(); event.preventDefault();"
+             ondragover="event.stopPropagation(); event.preventDefault();"
+             ondrop="event.stopPropagation(); event.preventDefault();dodrop(event);">
+          <span>Drop file here</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         Shown only once a code has been decoded. Two explicit choices —
+         no more silent auto-save now that there's a real decision to make.
+         ==================================================================== -->
+    <div id="protectChoice" class="protect-choice" hidden>
+      <p class="method-sub" style="text-align:center; margin-bottom:10px;">Protect this code with:</p>
+      <div class="protect-buttons">
+        <button class="protect-btn" id="btnProtectPm" type="button">
+          <img src="img/icons/password-manager.svg" width="22" height="22" alt="">
+          <span>Password Manager</span>
+        </button>
+        <button class="protect-btn" id="btnProtectBio" type="button">
+          <img src="img/icons/biometry.svg" width="22" height="22" alt="">
+          <span>Biometrics</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       SHARED: Issuer + TOTP. No Secret field exists anywhere on this page.
+       ====================================================================== -->
+  <section id="authenticatorView" class="state-card state-running" hidden>
+    <label class="field-label" for="issuer">Account</label>
+    <input type="text" id="issuer" readonly>
+
+    <div class="code-ring">
+      <svg class="ring-svg" viewBox="0 0 120 120">
+        <circle class="ring-track" cx="60" cy="60" r="52"/>
+        <circle class="ring-progress" id="ringProgress" cx="60" cy="60" r="52"/>
+      </svg>
+      <div class="code-display">
+        <input type="text" id="myTotp" readonly>
+      </div>
+    </div>
+    <div id="myTotpSeconds" class="countdown-text"></div>
+    <div id="saveStatus" class="status-text"></div>
+    <div id="activeMethodTag" class="active-method-tag" hidden></div>
+  </section>
+
+  <!-- Technical form used only by Chrome Password Manager SAVE. Kept out
+       of the visible UI, but its fields retain normal username/
+       current-password semantics for PasswordCredential(form). -->
+  <form id="chromePmForm" onsubmit="return false;" autocomplete="on" class="visually-hidden">
+    <input type="text" id="chromePmUsername" name="username" autocomplete="username">
+    <input type="password" id="chromePmPassword" name="password" autocomplete="current-password">
+  </form>
+
+</main>
+
+<script type="text/javascript" src="js/easy.js"></script>
+</body>
+</html>

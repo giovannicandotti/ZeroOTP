@@ -1,0 +1,255 @@
+<!DOCTYPE HTML>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZeroOTP — Biometric</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/uploadFile.css">
+  <link rel="stylesheet" href="css/easy.css">
+  <link rel="stylesheet" href="css/biometry.css">
+  <script type="text/javascript" src="js/zxing.js"></script>
+  <script type="text/javascript" src="js/totp.js"></script>
+  <script type="text/javascript" src="js/biometric.js"></script>
+</head>
+<body>
+<main class="shell">
+
+  <header class="topbar">
+    <div class="brand-compact">
+      <img src="img/icon.png" width="36" height="36" alt="ZeroOTP icon" class="brand-icon-sm">
+      <span class="brand-name">ZeroOTP</span>
+    </div>
+  </header>
+
+  <a class="back-link" href="index.html">&larr; Back to ZeroOTP</a>
+
+  <!-- ======================================================================
+       CHROME GATE — shown instead of everything else, and nothing else
+       initializes, when the browser is not detected as Google Chrome.
+       See js/biometry.js: checkChromeOrStop().
+       ====================================================================== -->
+  <section id="chromeGate" class="state-card chrome-gate" hidden>
+    <svg class="gate-icon" viewBox="0 0 24 24" fill="none" stroke="#E8963D" stroke-width="1.8" aria-hidden="true">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 8v5M12 16h.01" stroke-linecap="round"/>
+    </svg>
+    <h2>This page requires Google Chrome</h2>
+    <p>
+      The biometric vault is built on Chrome's own passkey storage
+      (Chrome Password Manager). It has not been tested against other
+      browsers' passkey implementations, so this page won't run its logic
+      anywhere else. Open this page in Chrome to continue &mdash; or use
+      <a href="full.html">full.html</a>, which offers Cookie/LocalStorage
+      storage that works in any modern browser.
+    </p>
+  </section>
+
+  <!-- ======================================================================
+       MAIN CONTENT — hidden until the Chrome check passes.
+       ====================================================================== -->
+  <div id="mainContent" hidden>
+
+    <!-- ======================================================================
+         Shown instead of the full page when a biometric vault is already
+         detected on load (no provisioning, no full controls) — mirrors
+         easy.html's bioPromptView. Unlocking always needs an explicit user
+         gesture, so this is a button, never an auto-prompt.
+         ====================================================================== -->
+    <section id="bioPromptView" class="state-card" hidden>
+      <div class="method-icon-row">
+        <img src="img/icons/biometry.svg" width="28" height="28" alt="Biometry">
+      </div>
+      <h2 style="text-align:center;">Biometric vault found</h2>
+      <p style="text-align:center; color: var(--muted); font-size: 14px;">Unlock it with your passkey to load your code.</p>
+      <div style="text-align:center; margin-top:16px;">
+        <button class="button" id="btnBioPromptUnlock" type="button">Unlock with passkey</button>
+      </div>
+      <div id="bioPromptStatus" class="status-text" style="text-align:center;"></div>
+      <div style="text-align:center; margin-top:10px;">
+        <button class="back-link" id="btnBioPromptFallback" type="button" style="background:none; border:none; cursor:pointer; font-size:12px;">Trouble unlocking? Manage vault instead</button>
+      </div>
+    </section>
+
+    <section class="state-card bio-hero" id="bioHeroSection">
+      <img src="img/icons/biometry-hero.svg" alt="Passkey stored in Chrome Password Manager">
+      <h2>Unlock with a passkey</h2>
+      <p>
+        Your TOTP secret is sealed behind a passkey &mdash; the same kind
+        Chrome already uses for passwordless sign-in. That passkey is
+        created and held by <b>Chrome Password Manager</b>, not by this
+        page: nothing here can read it without your fingerprint, face, or
+        device PIN.
+      </p>
+      <div class="method-icon-row">
+        <img src="img/icons/biometry.svg" alt="Biometry">
+        <span class="plus">+</span>
+        <img src="img/icons/password-manager.svg" alt="Password Manager">
+      </div>
+      <span class="chrome-only-badge">Chrome only</span>
+
+      <details class="prf-details">
+        <summary>
+          <svg class="prf-info-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span>What is PRF, and where does my data actually live?</span>
+        </summary>
+
+        <div class="prf-details-body">
+          <h3>What PRF is</h3>
+          <p>
+            PRF (<b>P</b>seudo-<b>R</b>andom <b>F</b>unction) is a WebAuthn
+            extension. Normally a passkey only ever answers yes/no: <i>"this
+            user passed verification."</i> PRF lets a site hand the
+            authenticator a salt and get back <code>HMAC-SHA256(credential-bound-secret,
+            salt)</code> &mdash; a 32-byte value that's <u>deterministic</u> (same
+            credential + same salt = same output, always) but <u>impossible to
+            reproduce</u> without the physical authenticator and a successful
+            Touch&nbsp;ID / Windows&nbsp;Hello / Android biometric check. That
+            output is what gets fed into HKDF-SHA256 to derive the AES-256-GCM
+            key that actually protects your TOTP secret.
+          </p>
+
+          <h3>Where the encrypted data lives</h3>
+          <p>
+            In <code>localStorage</code>, under the key <code>bioVaultRecord</code>
+            &mdash; a JSON blob holding the AES-GCM <b>ciphertext</b>, its IV, and
+            two non-secret salts. <u>Never cleartext at rest.</u> In the primary
+            "prf" mode, the AES key itself is written <i>nowhere</i>: it's
+            re-derived fresh from a new PRF output every time you unlock. See
+            <code>js/biometric.js</code> for the full implementation, including
+            its weaker fallback "gate" mode for authenticators without PRF
+            support.
+          </p>
+
+          <h3>Does macOS support PRF?</h3>
+          <p>
+            Yes &mdash; <b>macOS 15 (Sequoia) or later</b>, via passkeys held in
+            <b>iCloud Keychain</b>, on Safari 18+, Chrome 132+, or Firefox 139+.
+            One open caveat: that confirmed support is specifically for the
+            <i>iCloud Keychain</i> path. When Chrome creates a passkey it may
+            offer to save it to <b>Google Password Manager</b> instead (cloud-synced
+            to your Google account) &mdash; whether that separate store returns
+            PRF output the same way on macOS isn't something this page assumes.
+            Use "check support" below to see what your own setup actually reports.
+          </p>
+
+          <h3>Requirements for PRF to actually work</h3>
+          <table class="prf-req-table">
+            <tr><th>Layer</th><th>What's needed</th></tr>
+            <tr><td>Browser</td><td>WebAuthn <code>prf</code> extension &mdash; Chrome 132+, Safari 18+, Firefox 139+ (Windows needs newer builds still: Chrome 147+ / Firefox 148+)</td></tr>
+            <tr><td>OS / authenticator</td><td>CTAP2 <code>hmac-secret</code> support &mdash; macOS 15+, current Windows Hello builds, Android generally</td></tr>
+            <tr><td>Authenticator type</td><td>Platform (built-in) authenticator is reliable; roaming FIDO2 keys are inconsistent, and iOS/iPadOS Safari doesn't pass PRF to roaming keys at all</td></tr>
+            <tr><td>Timing</td><td>Requested at credential creation, but many implementations only return it on a follow-up assertion &mdash; which is why this page always does one</td></tr>
+            <tr><td>Context</td><td>Secure context (HTTPS or localhost) and user verification enabled</td></tr>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <!-- ====================================================================
+         Provisioning — same four QR intake methods as the other pages.
+         ==================================================================== -->
+    <section id="provisioningView" class="state-card state-provisioning">
+      <h2>Bring in a code</h2>
+      <p class="hint">Use any of the methods below to load an Issuer/Secret pair.</p>
+
+      <div class="methods">
+        <div class="method method-primary">
+          <p class="method-title">Drop a QR image</p>
+          <p class="method-sub">Drag one in from this page, or your desktop</p>
+          <div class="dropzone" id="div1" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <span>Drop image here</span>
+          </div>
+          <div class="method-sample">
+            <img id="drag1" src="img/qrcode.png" draggable="true" ondragstart="drag(event)" width="72" height="21" alt="Sample QR code">
+            <span>myOtp@example.com</span>
+          </div>
+        </div>
+
+        <div class="method">
+          <p class="method-title">Paste a QR image</p>
+          <p class="method-sub">Copy an image, then paste it below</p>
+          <img src="img/copyToClipboard.png" onclick="copyToClipboardImg()" width="30" class="method-icon" alt="Insert a sample QR code" title="Insert a sample QR code">
+          <textarea id="textOnly" rows="3" onchange="fromTextOnly()" placeholder="Paste image data here"></textarea>
+        </div>
+
+        <div class="method">
+          <p class="method-title">Drop from another window</p>
+          <p class="method-sub">Drag an image from another browser tab</p>
+          <div class="dropzone dropzone-compact" ondrop="dropFromBrowser(event)" ondragover="allowDrop(event)">
+            <span>Drop here</span>
+          </div>
+          <img id="div3" src="" hidden alt="">
+        </div>
+
+        <div class="method">
+          <p class="method-title">Drop a file</p>
+          <p class="method-sub">From Finder or Explorer</p>
+          <div id="output" class="dropzone dropzone-compact"
+               ondragenter="document.getElementById('output').textContent = ''; event.stopPropagation(); event.preventDefault();"
+               ondragover="event.stopPropagation(); event.preventDefault();"
+               ondrop="event.stopPropagation(); event.preventDefault();dodrop(event);">
+            <span>Drop file here</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-visible" style="margin-top:18px;">
+        <label for="qrIssuer">Issuer</label>
+        <input type="text" id="qrIssuer" placeholder="Populated automatically from a QR code">
+      </div>
+      <div class="field-visible">
+        <label for="qrSecret">Secret</label>
+        <input type="text" id="qrSecret" placeholder="Populated automatically from a QR code">
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <section id="authenticatorView" class="state-card state-running">
+      <label class="field-label">Account</label>
+      <div id="issuerDisplay" style="font-family: var(--sans); font-weight:600; font-size:18px; text-align:center; margin-bottom: 20px;"></div>
+
+      <div class="code-ring">
+        <svg class="ring-svg" viewBox="0 0 120 120">
+          <circle class="ring-track" cx="60" cy="60" r="52"/>
+          <circle class="ring-progress" id="ringProgress" cx="60" cy="60" r="52"/>
+        </svg>
+        <div class="code-display">
+          <input type="text" id="myTotp" readonly>
+        </div>
+      </div>
+      <div id="myTotpSeconds" class="countdown-text"></div>
+    </section>
+
+    <!-- ====================================================================
+         Biometric controls — save (enrol) / get (unlock) / clean / probe.
+         Hidden (along with provisioningView) once a secret has been
+         successfully loaded via bioGet() — see js/biometry.js.
+         ==================================================================== -->
+    <section class="state-card" id="bioControlsSection">
+      <h2 style="margin-top:0;">Biometric vault</h2>
+      <div class="bio-actions">
+        <button class="primary" id="btnBioSave" type="button">Save (enrol)</button>
+        <button id="btnBioGet" type="button">Get (unlock)</button>
+        <button id="btnBioClean" type="button">Delete vault</button>
+        <button id="btnBioProbe" type="button">Check support</button>
+      </div>
+      <div id="bioStatus" class="bio-status"></div>
+    </section>
+
+    <div id="manageVaultLink" hidden style="text-align: center; margin-top: 8px;">
+      <button class="back-link" id="btnManageVault" type="button" style="background:none; border:none; cursor:pointer; font-size:13px;">Manage vault</button>
+    </div>
+
+  </div>
+
+</main>
+
+<script type="text/javascript" src="js/biometry.js"></script>
+</body>
+</html>

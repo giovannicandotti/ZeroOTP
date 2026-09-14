@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZeroOTP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/uploadFile.css">
+  <link rel="stylesheet" href="css/easy.css">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+<main class="shell" style="max-width: 1520px;">
+
+  <header class="topbar">
+    <div class="brand-compact">
+      <img src="img/icon.png" width="72" height="72" alt="ZeroOTP icon" class="brand-icon-sm">
+      <span class="brand-name">ZeroOTP</span>
+    </div>
+    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light mode">
+      <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5Z" fill="currentColor"/>
+      </svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" hidden>
+        <circle cx="12" cy="12" r="5" fill="currentColor"/>
+        <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="12" y1="1" x2="12" y2="4"/>
+          <line x1="12" y1="20" x2="12" y2="23"/>
+          <line x1="1" y1="12" x2="4" y2="12"/>
+          <line x1="20" y1="12" x2="23" y2="12"/>
+          <line x1="4.2" y1="4.2" x2="6.3" y2="6.3"/>
+          <line x1="17.7" y1="17.7" x2="19.8" y2="19.8"/>
+          <line x1="4.2" y1="19.8" x2="6.3" y2="17.7"/>
+          <line x1="17.7" y1="6.3" x2="19.8" y2="4.2"/>
+        </g>
+      </svg>
+    </button>
+  </header>
+
+  <section class="hub-hero">
+    <h1>One idea, four ways to protect it</h1>
+    <p>ZeroOTP generates TOTP codes entirely in your browser. Pick the page that matches how much control you want.</p>
+  </section>
+
+  <div class="hub-cards" style="margin-top: 24px;">
+
+    <a class="hub-card" href="easy.html">
+      <div class="hub-icons">
+        <img src="img/icons/password-manager.svg" alt="Password Manager">
+        <img src="img/icons/biometry.svg" alt="Biometry">
+      </div>
+      <h3>ZeroOTP &mdash; guided</h3>
+      <p>The default experience. Detects what you have saved and shows only what's needed. Password Manager or a passkey.</p>
+      <span class="hub-badge">Start here</span>
+    </a>
+
+    <a class="hub-card" href="full.html">
+      <div class="hub-icons">
+        <img src="img/icons/password-manager.svg" alt="Password Manager">
+        <img src="img/icons/cookie.svg" alt="Cookie">
+        <img src="img/icons/localstorage.svg" alt="LocalStorage">
+        <img src="img/icons/biometry.svg" alt="Biometry">
+      </div>
+      <h3>Full version</h3>
+      <p>Every provisioning method and all four storage backends, on one page, for full manual control.</p>
+      <span class="hub-badge">Power users</span>
+    </a>
+
+    <a class="hub-card" href="biometry.html">
+      <div class="hub-icons">
+        <img src="img/icons/biometry.svg" alt="Biometry">
+      </div>
+      <h3>Biometric only</h3>
+      <p>A dedicated passkey vault, backed by Chrome Password Manager. Nothing else on the page.</p>
+      <span class="hub-badge">Chrome only</span>
+    </a>
+
+  </div>
+
+  <div id="zerotpIndexTextSections">
+
+  <!-- ======================================================================
+       NIST / Microsoft framework mapping — condensed. Full detail and
+       source links: compliance.html / COMPLIANCE.md
+       ====================================================================== -->
+  <section class="state-card compliance-block" style="margin-top: 28px;">
+    <h2 style="margin-top:0; color: var(--ink);">How this fits: NIST &amp; Microsoft</h2>
+    <p><b>ZeroOTP uses two fundamentally different kinds of authenticator</b>, and the two current frameworks below score them very differently. This is a factual mapping against <u>NIST SP&nbsp;800-63B-4</u> (2025) and <u>Microsoft Entra's Conditional Access authentication strengths</u> &mdash; <i>not</i> a certification of this project.</p>
+    <table>
+      <tr><th>Method</th><th>NIST SP 800-63B-4</th><th>Microsoft Entra strength</th></tr>
+      <tr>
+        <td>Cookie / LocalStorage / Password Manager <i>(TOTP)</i></td>
+        <td>Software OATH token &mdash; <b>AAL2</b>, but <i>not phishing-resistant</i></td>
+        <td><b>MFA strength</b> only</td>
+      </tr>
+      <tr>
+        <td>Biometric / passkey <i>(PRF mode)</i></td>
+        <td>Syncable passkey &mdash; <b>AAL2</b>, genuinely <i>phishing-resistant</i></td>
+        <td><b>Phishing-resistant MFA strength</b></td>
+      </tr>
+    </table>
+    <p><i>In short:</i> the three TOTP-based backends are the same authenticator type by NIST's definition &mdash; a shared secret &mdash; and all land at the same tier. Only the Biometric method's primary (PRF) mode is phishing-resistant; its fallback &ldquo;gate&rdquo; mode is <u>not</u> cryptographically bound to the passkey and shouldn't be treated as equivalent (see <code>js/biometric.js</code>).</p>
+    <p>Full mapping, methodology, and links to the primary NIST and Microsoft sources: <a href="compliance.html">compliance.html</a> (or the raw <a href="COMPLIANCE.md">COMPLIANCE.md</a>).</p>
+  </section>
+
+  <!-- ======================================================================
+       Limitations — last section on the page.
+       ====================================================================== -->
+  <section class="state-card" style="margin-top: 20px; margin-bottom: 40px;">
+    <h2 style="margin-top:0;">Known limitations</h2>
+    <ul class="limitations-list">
+      <li><b>Low PBKDF2 iterations</b> (Cookie / LocalStorage only): 6,000 iterations, intentionally low for demo speed. NIST's current guidance calls for substantially more &mdash; treat this as a demo value, not a production one.</li>
+      <li><b>Hardcoded salt</b> (Cookie / LocalStorage only): the PBKDF2 salt is a fixed string baked into the source rather than randomized per device or retrieved from a server.</li>
+      <li><b>No Master Password complexity check</b> (Cookie / LocalStorage only): any string is accepted, with no minimum length or strength requirement enforced.</li>
+      <li><b>One entry per backend &mdash; partially resolved.</b> Cookie, LocalStorage, and the Biometric vault each store exactly one Issuer/Secret pair. <u>Chrome Password Manager is the exception</u>: it already manages multiple entries for this origin natively, offering its own account picker to choose between them &mdash; this is exactly how the multi-account detection in ZeroOTP's guided page works today. So this limitation still stands for three of the four backends, but no longer for Password Manager.</li>
+    </ul>
+  </section>
+
+  </div>
+
+</main>
+
+<script type="text/javascript" src="js/index.js"></script>
+</body>
+</html>

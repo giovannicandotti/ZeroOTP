@@ -1,0 +1,9 @@
+/Users/giovannicandotti/Documents/ZeroOTP/ZeroOTP+KeyCloak/ZeroOTP-main-updated/KeyCloakPlugin/src/main/java/com/zerotp/keycloak/authenticator/HardwareTotpAuthenticator.java
+/Users/giovannicandotti/Documents/ZeroOTP/ZeroOTP+KeyCloak/ZeroOTP-main-updated/KeyCloakPlugin/src/main/java/com/zerotp/keycloak/authenticator/HardwareTotpAuthenticatorFactory.java
+/Users/giovannicandotti/Documents/ZeroOTP/ZeroOTP+KeyCloak/ZeroOTP-main-updated/KeyCloakPlugin/src/main/java/com/zerotp/keycloak/authenticator/HardwareTotpEnrollRequiredAction.java
+/Users/giovannicandotti/Documents/ZeroOTP/ZeroOTP+KeyCloak/ZeroOTP-main-updated/KeyCloakPlugin/src/main/java/com/zerotp/keycloak/authenticator/HardwareTotpEnrollRequiredActionFactory.java
+/Users/giovannicandotti/Documents/ZeroOTP/ZeroOTP+KeyCloak/ZeroOTP-main-updated/KeyCloakPlugin/src/main/java/com/zerotp/keycloak/credential/HardwareTotpCredentialModel.java
+/Users/giovannicandotti/Documents/ZeroOTP/ZeroOTP+KeyCloak/ZeroOTP-main-updated/KeyCloakPlugin/src/main/java/com/zerotp/keycloak/credential/HardwareTotpCredentialProvider.java
+/Users/giovannicandotti/Documents/ZeroOTP/ZeroOTP+KeyCloak/ZeroOTP-main-updated/KeyCloakPlugin/src/main/java/com/zerotp/keycloak/credential/HardwareTotpCredentialProviderFactory.java
+/Users/giovannicandotti/Documents/ZeroOTP/ZeroOTP+KeyCloak/ZeroOTP-main-updated/KeyCloakPlugin/src/main/java/com/zerotp/keycloak/util/Base32Util.java
+/Users/giovannicandotti/Documents/ZeroOTP/ZeroOTP+KeyCloak/ZeroOTP-main-updated/KeyCloakPlugin/src/main/java/com/zerotp/keycloak/util/WebAuthnAssertionVerifier.java
