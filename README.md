@@ -17,11 +17,12 @@
 
 ---
 
-## Executive highlights
-**TOTP browser only**: storing the TOTP secret in the browser is all you need to generate TOTP by the computational capabilities of the browser itself. you can store it in a cookie, encrypt with a password and saved in local storage, saved in the Chrome Password Manager. Your free choice.
-Nothing to install on client (browser), nothing stored on server. Think of the web page as a config file for an application (the browser), accessed securely by **httpS**. 
+### Executive highlights
+**TOTP browser only**: Storing the TOTP secret in the browser is all you need to generate TOTP by the computational capabilities of the browser itself. you can store it in a cookie, or encrypt with a password and save in local storage, or save in the Chrome Password Manager. Your free choice.
+Nothing to install on client (browser), nothing stored on server. 
+Think of the web page as a config file for an application (the browser), accessed securely by **httpS**. 
 
-**TOTP+biometry**: The verifier issues a fresh challenge; after local biometric verification activates the passkey, its PRF-derived keying material allows the client to decrypt the TOTP secret, from which it generates both the six-digit TOTP and a keyed HMAC proof bound to that TOTP and the verifier’s challenge. The verifier independently reconstructs and verifies that proof, demonstrating possession of the secret for that specific authentication transaction rather than merely possession of a transferable six-digit OTP.
+**TOTP+biometry**: The verifier issues a fresh challenge; after client local biometric verification activates the passkey, its PRF-derived keying material allows the client to decrypt the TOTP secret, from which it generates both the six-digit TOTP and a keyed HMAC proof bound to that TOTP and the verifier’s challenge. The verifier independently reconstructs and verifies that proof, demonstrating possession of the secret for that specific authentication transaction rather than merely possession of a transferable six-digit OTP.
 
 ---
 
