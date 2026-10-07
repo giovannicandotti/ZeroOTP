@@ -17,6 +17,11 @@
 
 ---
 
+## Executive sentences
+TOTP+biometry: The verifier issues a fresh challenge; after local biometric verification activates the passkey, its PRF-derived keying material allows the client to decrypt the TOTP secret, from which it generates both the six-digit TOTP and a keyed HMAC proof bound to that TOTP and the verifier’s challenge. The verifier independently reconstructs and verifies that proof, demonstrating possession of the secret for that specific authentication transaction rather than merely possession of a transferable six-digit OTP.
+
+---
+
 ## Repository layout
 
 ```text
@@ -44,11 +49,6 @@ ZeroOTP/
 The root application and `KeyCloakPlugin/` are not separate products. The plugin is a derived server-side integration of the same ZeroOTP design: protect a TOTP secret with key material obtained through **WebAuthn PRF**, then use the recovered secret only after successful local user verification.
 
 The Keycloak implementation extends that design with an additional property that is security-critical: **the TOTP is cryptographically bound to the current Keycloak authentication session**. A six-digit code alone is therefore not sufficient to authenticate through the plugin.
-
----
-
-## Executive sentences
-TOTP+biometry: The verifier issues a fresh challenge; after local biometric verification activates the passkey, its PRF-derived keying material allows the client to decrypt the TOTP secret, from which it generates both the six-digit TOTP and a keyed HMAC proof bound to that TOTP and the verifier’s challenge. The verifier independently reconstructs and verifies that proof, demonstrating possession of the secret for that specific authentication transaction rather than merely possession of a transferable six-digit OTP.
 
 ---
 
