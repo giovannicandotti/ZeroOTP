@@ -23,7 +23,7 @@
 
 **KeyCloak plugin**: use case for **TOTP+biometry**, embedded in a plugin. Lock the access to a single device whilst preserving biometry passkey semplicity.
 
-## Side effect: TOTP can be generated within browsers
+### Side effect: yes, TOTP can be generated within browsers
 **TOTP browser only**: Storing the TOTP secret in the browser is all you need to generate TOTP by the computational capabilities of the browser itself. You can store it in a cookie, or encrypt with a password and save in local storage, or save in the Chrome Password Manager. Your free choice.
 Nothing to install on client (browser), nothing stored on server. 
 Think of the web page as a config file for an application (the browser), accessed securely by **httpS**. 
