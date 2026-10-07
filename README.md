@@ -47,6 +47,11 @@ The Keycloak implementation extends that design with an additional property that
 
 ---
 
+## Executive sentences
+TOTP+biometry: The verifier issues a fresh challenge; after local biometric verification activates the passkey, its PRF-derived keying material allows the client to decrypt the TOTP secret, from which it generates both the six-digit TOTP and a keyed HMAC proof bound to that TOTP and the verifier’s challenge. The verifier independently reconstructs and verifies that proof, demonstrating possession of the secret for that specific authentication transaction rather than merely possession of a transferable six-digit OTP.
+
+---
+
 ## 1. Standalone ZeroOTP
 
 The standalone application runs entirely in the browser. All pages generate standards-compatible RFC 6238 TOTP values; the pages differ in user experience and in how the TOTP secret is stored or protected.
