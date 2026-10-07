@@ -17,7 +17,7 @@
 
 ---
 
-## Executive sentences
+## Executive highlights
 **TOTP browser only**: storing the TOTP secret in the browser is all you need to generate TOTP by the computational capabilities of the browser itself. you can store it in a cookie, encrypt with a password and saved in local storage, saved in the Chrome Password Manager. Your free choice.
 Nothing to install on client (browser), nothing stored on server. Think of the web page as a config file for an application (the browser), accessed securely by **httpS**. 
 
