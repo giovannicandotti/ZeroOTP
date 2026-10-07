@@ -24,6 +24,10 @@ Think of the web page as a config file for an application (the browser), accesse
 
 **TOTP+biometry**: The verifier issues a fresh challenge; after client local biometric verification activates the passkey, its PRF-derived keying material allows the client to decrypt the TOTP secret, from which it generates both the six-digit TOTP and a keyed HMAC proof bound to that TOTP and the verifier’s challenge. The verifier independently reconstructs and verifies that proof, demonstrating possession of the secret for that specific authentication transaction rather than merely possession of a transferable six-digit OTP.
 
+**KeyCloak plugin**: use case for **TOTP+biometry**, embedded in a plugin. Lock the access to a single device whilst preserving biometry passkey semplicity.
+
+# An alternative to device-bound passkey: using syncable passkey plus a locally stored secret, which is not synchronized or replicated.
+
 ---
 
 ## Repository layout
