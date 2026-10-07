@@ -18,7 +18,7 @@
 ---
 
 # Executive highlights
-## Using a locally stored secret combined with a synchronizable passkey neutralizes the inherent weakness of passkey synchronization.
+## Using a locally stored secret combined with a syncable passkey neutralizes the inherent weakness of passkey synchronization.
 **TOTP+biometry**: The verifier issues a fresh challenge; after client local biometric verification activates the passkey, its PRF-derived keying material allows the client to decrypt the TOTP secret, from which it generates both the six-digit TOTP and a keyed HMAC proof bound to that TOTP and the verifier’s challenge. The verifier independently reconstructs and verifies that proof, demonstrating possession of the secret for that specific authentication transaction rather than merely possession of a transferable six-digit OTP.
 
 **KeyCloak plugin**: use case for **TOTP+biometry**, embedded in a plugin. Lock the access to a single device whilst preserving biometry passkey semplicity.
